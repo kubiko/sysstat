@@ -1,0 +1,103 @@
+name: sysstat-snap
+version: "11.x"
+version-script: git --git-dir=parts/sysstat/src/.git describe --tags | cut -c 2-
+summary: sysstat 
+description: |
+  sysstat avahi service daemon
+
+
+confinement: strict
+grade: stable
+
+apps:
+    sa1:
+        command: usr/local/lib/sa/sa1 1 1
+#        daemon: simple
+#        timer: 0:00-24:00/144
+        environment:
+             PATH: $PATH:$SNAP/usr/local/lib/sa
+        plugs:
+          - system-observe
+          - mount-observe
+          - raw-usb
+          - network-observe
+          - core-support
+    sa1-daily:
+        command: usr/local/lib/sa/sa1 60 2
+#        daemon: simple
+#        timer: 23:59
+        environment:
+             PATH: $PATH:$SNAP/usr/local/lib/sa
+        plugs:
+          - system-observe
+          - mount-observe
+          - raw-usb
+          - network-observe
+          - core-support
+
+    sa2:
+        command: usr/local/lib/sa/sa2 -A
+#        daemon: simple
+#        timer: 00:00~04:00
+        environment:
+             PATH: $PATH:$SNAP/usr/local/lib/sa
+        plugs:
+          - system-observe
+          - mount-observe
+          - raw-usb
+          - network-observe
+          - core-support
+
+    sadf:
+        command: usr/local/bin/sadf
+
+    sar:
+        command: usr/local/bin/sar
+
+    iostat:
+        command: usr/local/bin/iostat
+        plugs:
+          - system-observe
+
+    mpstat:
+        command: usr/local/bin/mpstat
+        plugs:
+          - hardware-observe
+
+    pidstat:
+        command: usr/local/bin/pidstat
+        plugs:
+          - hardware-observe
+          - system-observe
+
+    tapestat:
+        command: usr/local/bin/tapestat
+        plugs:
+          - hardware-observe
+
+    cifsiostat:
+        command: usr/local/bin/cifsiostat
+
+#    help:
+#        command: sysstat-help
+
+parts:
+    sysstat:
+        plugin: autotools
+        source: https://github.com/sysstat/sysstat.git
+        build-packages: [ rsync ]
+        build: |
+            SNAP=/snap/${SNAPCRAFT_PROJECT_NAME}/current \
+               SNAP_COMMON=/var/snap/${SNAPCRAFT_PROJECT_NAME}/common \
+               sa_lib_dir="\${SNAP}/usr/local/lib/sa" \
+               sa_dir="\${SNAP_COMMON}/var/log/sysstat" \
+               conf_dir="\${SNAP_COMMON}/etc/sysstat"  \
+               ./configure --disable-documentation --disable-sensors
+            make -j$(nproc)
+        install: |
+             SNAP=/snap/${SNAPCRAFT_PROJECT_NAME}/current \
+               SNAP_COMMON=/var/snap/${SNAPCRAFT_PROJECT_NAME}/common DESTDIR=${SNAPCRAFT_PART_INSTALL} make install
+             rsync -avhu --progress ${SNAPCRAFT_PART_INSTALL}/snap/*/*/ ${SNAPCRAFT_PART_INSTALL}/
+             rm -r ${SNAPCRAFT_PART_INSTALL}/snap
+             rsync -avhu --progress ${SNAPCRAFT_PART_INSTALL}/var/snap/*/*/ ${SNAPCRAFT_PART_INSTALL}
+             rm -rf ${SNAPCRAFT_PART_INSTALL}/var/snap

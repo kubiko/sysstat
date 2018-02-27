@@ -1,0 +1,12 @@
+#!/bin/bash
+
+exec >> $SNAP_DATA/hook.log 2>&1
+echo "$(date '+%Y-%m-%d %H:%M:%S') $0: Entering hook"
+
+set -x
+if [ ! -e ${SNAP_COMMON}/etc ]; then
+    cp -r ${SNAP}/etc  ${SNAP_COMMON}
+fi
+if [ ! -e ${SNAP_COMMON}/var ]; then 
+    cp -r ${SNAP}/var  ${SNAP_COMMON}
+fi
