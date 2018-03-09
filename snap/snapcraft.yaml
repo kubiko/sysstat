@@ -12,8 +12,8 @@ grade: stable
 apps:
     sa1:
         command: usr/local/lib/sa/sa1 1 1
-#        daemon: simple
-#        timer: 0:00-24:00/144
+        daemon: simple
+        timer: 0:00-24:00/144
         environment:
              PATH: $PATH:$SNAP/usr/local/lib/sa
         plugs:
@@ -24,8 +24,8 @@ apps:
           - core-support
     sa1-daily:
         command: usr/local/lib/sa/sa1 60 2
-#        daemon: simple
-#        timer: 23:59
+        daemon: simple
+        timer: 23:59
         environment:
              PATH: $PATH:$SNAP/usr/local/lib/sa
         plugs:
@@ -37,8 +37,8 @@ apps:
 
     sa2:
         command: usr/local/lib/sa/sa2 -A
-#        daemon: simple
-#        timer: 00:00~04:00
+        daemon: simple
+        timer: 00:00~04:00
         environment:
              PATH: $PATH:$SNAP/usr/local/lib/sa
         plugs:
